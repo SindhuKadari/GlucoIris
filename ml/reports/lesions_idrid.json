@@ -1,0 +1,387 @@
+{
+ "meta": {
+  "model": "ResUNet(resnet34)",
+  "classes": [
+   "microaneurysms",
+   "haemorrhages",
+   "hard_exudates",
+   "soft_exudates"
+  ],
+  "input": "square fundus crop resized to 1024px RGB, ImageNet normalisation",
+  "size": 1024,
+  "thresholds": {
+   "microaneurysms": 0.55,
+   "haemorrhages": 0.2,
+   "hard_exudates": 0.45,
+   "soft_exudates": 0.9
+  },
+  "best_epoch": 40,
+  "val_metrics": {
+   "microaneurysms": {
+    "aupr": 0.37566667094296297,
+    "threshold": 0.55,
+    "dice": 0.4582888841476424,
+    "positive_pixels": 4441
+   },
+   "haemorrhages": {
+    "aupr": 0.694179293452476,
+    "threshold": 0.2,
+    "dice": 0.6714613730516443,
+    "positive_pixels": 42137
+   },
+   "hard_exudates": {
+    "aupr": 0.8549500020812923,
+    "threshold": 0.45,
+    "dice": 0.776605573580284,
+    "positive_pixels": 46507
+   },
+   "soft_exudates": {
+    "aupr": 0.734932408232092,
+    "threshold": 0.9,
+    "dice": 0.7322805728975395,
+    "positive_pixels": 8936
+   }
+  },
+  "test_metrics": {
+   "microaneurysms": {
+    "aupr": 0.43293972456791097,
+    "threshold": 0.55,
+    "dice": 0.4777263623178396,
+    "positive_pixels": 27615
+   },
+   "haemorrhages": {
+    "aupr": 0.6853326914401812,
+    "threshold": 0.2,
+    "dice": 0.6461780883533192,
+    "positive_pixels": 299023
+   },
+   "hard_exudates": {
+    "aupr": 0.8592263237121467,
+    "threshold": 0.45,
+    "dice": 0.7778277791291657,
+    "positive_pixels": 307433
+   },
+   "soft_exudates": {
+    "aupr": 0.6705882831809018,
+    "threshold": 0.9,
+    "dice": 0.6632997604686733,
+    "positive_pixels": 51458
+   }
+  },
+  "dataset": "IDRiD A. Segmentation (54 train incl. held-out val / 27 test)",
+  "smoke_test": false,
+  "version": "resunet-lesions-idrid-1.0"
+ },
+ "history": [
+  {
+   "epoch": 4,
+   "loss": 1.5041606386502584,
+   "val_mAUPR": 0.2879226435959935,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.0016083294995782055,
+     "threshold": 0.45,
+     "dice": 0.007059260635333457,
+     "positive_pixels": 4441
+    },
+    "haemorrhages": {
+     "aupr": 0.4101825314367912,
+     "threshold": 0.75,
+     "dice": 0.4451330611376362,
+     "positive_pixels": 42137
+    },
+    "hard_exudates": {
+     "aupr": 0.7073053343247095,
+     "threshold": 0.8,
+     "dice": 0.6586658284123313,
+     "positive_pixels": 46507
+    },
+    "soft_exudates": {
+     "aupr": 0.03259437912289516,
+     "threshold": 0.45,
+     "dice": 0.04345629105608893,
+     "positive_pixels": 8936
+    }
+   }
+  },
+  {
+   "epoch": 8,
+   "loss": 1.291526244746314,
+   "val_mAUPR": 0.5301800717762026,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.15801141103524866,
+     "threshold": 0.55,
+     "dice": 0.2743247313987348,
+     "positive_pixels": 4441
+    },
+    "haemorrhages": {
+     "aupr": 0.5003567400744429,
+     "threshold": 0.65,
+     "dice": 0.5083066661762362,
+     "positive_pixels": 42137
+    },
+    "hard_exudates": {
+     "aupr": 0.7682064360625322,
+     "threshold": 0.85,
+     "dice": 0.6871601615074024,
+     "positive_pixels": 46507
+    },
+    "soft_exudates": {
+     "aupr": 0.6941456999325866,
+     "threshold": 0.7,
+     "dice": 0.675686475994748,
+     "positive_pixels": 8936
+    }
+   }
+  },
+  {
+   "epoch": 12,
+   "loss": 1.0308753218915727,
+   "val_mAUPR": 0.5134957723042813,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.28592572372049535,
+     "threshold": 0.7,
+     "dice": 0.34715652843471567,
+     "positive_pixels": 4441
+    },
+    "haemorrhages": {
+     "aupr": 0.4595269155476305,
+     "threshold": 0.35,
+     "dice": 0.4879437109652937,
+     "positive_pixels": 42137
+    },
+    "hard_exudates": {
+     "aupr": 0.7962451863165296,
+     "threshold": 0.85,
+     "dice": 0.7164349063834446,
+     "positive_pixels": 46507
+    },
+    "soft_exudates": {
+     "aupr": 0.5122852636324698,
+     "threshold": 0.3,
+     "dice": 0.5717517131262059,
+     "positive_pixels": 8936
+    }
+   }
+  },
+  {
+   "epoch": 16,
+   "loss": 0.8669206334484948,
+   "val_mAUPR": 0.5971962358378394,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.347750504113289,
+     "threshold": 0.85,
+     "dice": 0.41445126107702795,
+     "positive_pixels": 4441
+    },
+    "haemorrhages": {
+     "aupr": 0.5572028633740187,
+     "threshold": 0.65,
+     "dice": 0.5654739901339689,
+     "positive_pixels": 42137
+    },
+    "hard_exudates": {
+     "aupr": 0.8205694850917017,
+     "threshold": 0.55,
+     "dice": 0.7563063453536755,
+     "positive_pixels": 46507
+    },
+    "soft_exudates": {
+     "aupr": 0.6632620907723484,
+     "threshold": 0.9,
+     "dice": 0.5118802047520818,
+     "positive_pixels": 8936
+    }
+   }
+  },
+  {
+   "epoch": 20,
+   "loss": 0.6988123721546597,
+   "val_mAUPR": 0.6018763207810842,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.34305435755597385,
+     "threshold": 0.35,
+     "dice": 0.43440812720848054,
+     "positive_pixels": 4441
+    },
+    "haemorrhages": {
+     "aupr": 0.5235560171075884,
+     "threshold": 0.9,
+     "dice": 0.5272422248032004,
+     "positive_pixels": 42137
+    },
+    "hard_exudates": {
+     "aupr": 0.8278496968637638,
+     "threshold": 0.3,
+     "dice": 0.7594229368470261,
+     "positive_pixels": 46507
+    },
+    "soft_exudates": {
+     "aupr": 0.7130452115970107,
+     "threshold": 0.35,
+     "dice": 0.6658110376147695,
+     "positive_pixels": 8936
+    }
+   }
+  },
+  {
+   "epoch": 24,
+   "loss": 0.594662947456042,
+   "val_mAUPR": 0.5757123519620216,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.3231661952689174,
+     "threshold": 0.55,
+     "dice": 0.41857622975863124,
+     "positive_pixels": 4441
+    },
+    "haemorrhages": {
+     "aupr": 0.5495381681157565,
+     "threshold": 0.1,
+     "dice": 0.5600910147899033,
+     "positive_pixels": 42137
+    },
+    "hard_exudates": {
+     "aupr": 0.8273493886250277,
+     "threshold": 0.8,
+     "dice": 0.7611164958670485,
+     "positive_pixels": 46507
+    },
+    "soft_exudates": {
+     "aupr": 0.6027956558383848,
+     "threshold": 0.5,
+     "dice": 0.6437038988408852,
+     "positive_pixels": 8936
+    }
+   }
+  },
+  {
+   "epoch": 28,
+   "loss": 0.5285883549186918,
+   "val_mAUPR": 0.5763134396031638,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.3669724349244526,
+     "threshold": 0.55,
+     "dice": 0.4517709957674315,
+     "positive_pixels": 4441
+    },
+    "haemorrhages": {
+     "aupr": 0.3847988906680571,
+     "threshold": 0.9,
+     "dice": 0.3632725991544192,
+     "positive_pixels": 42137
+    },
+    "hard_exudates": {
+     "aupr": 0.8457511839112606,
+     "threshold": 0.35,
+     "dice": 0.7725778274503846,
+     "positive_pixels": 46507
+    },
+    "soft_exudates": {
+     "aupr": 0.707731248908885,
+     "threshold": 0.7,
+     "dice": 0.7059788018972888,
+     "positive_pixels": 8936
+    }
+   }
+  },
+  {
+   "epoch": 32,
+   "loss": 0.49373295174704657,
+   "val_mAUPR": 0.6228993256939914,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.39365927369614717,
+     "threshold": 0.5,
+     "dice": 0.46920821114369504,
+     "positive_pixels": 4441
+    },
+    "haemorrhages": {
+     "aupr": 0.5496204130207392,
+     "threshold": 0.75,
+     "dice": 0.5730972226227901,
+     "positive_pixels": 42137
+    },
+    "hard_exudates": {
+     "aupr": 0.8555666903257395,
+     "threshold": 0.6,
+     "dice": 0.7779952067896484,
+     "positive_pixels": 46507
+    },
+    "soft_exudates": {
+     "aupr": 0.6927509257333397,
+     "threshold": 0.85,
+     "dice": 0.6928442573662057,
+     "positive_pixels": 8936
+    }
+   }
+  },
+  {
+   "epoch": 36,
+   "loss": 0.46282705499066246,
+   "val_mAUPR": 0.6608830993664859,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.3775188683544674,
+     "threshold": 0.55,
+     "dice": 0.4599075222735987,
+     "positive_pixels": 4441
+    },
+    "haemorrhages": {
+     "aupr": 0.6779723005693209,
+     "threshold": 0.15,
+     "dice": 0.6630583187048956,
+     "positive_pixels": 42137
+    },
+    "hard_exudates": {
+     "aupr": 0.8551576958681358,
+     "threshold": 0.5,
+     "dice": 0.7762810101589122,
+     "positive_pixels": 46507
+    },
+    "soft_exudates": {
+     "aupr": 0.7328835326740197,
+     "threshold": 0.9,
+     "dice": 0.7227459511723471,
+     "positive_pixels": 8936
+    }
+   }
+  },
+  {
+   "epoch": 40,
+   "loss": 0.47178496056132846,
+   "val_mAUPR": 0.6649320936772058,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.37566667094296297,
+     "threshold": 0.55,
+     "dice": 0.4582888841476424,
+     "positive_pixels": 4441
+    },
+    "haemorrhages": {
+     "aupr": 0.694179293452476,
+     "threshold": 0.2,
+     "dice": 0.6714613730516443,
+     "positive_pixels": 42137
+    },
+    "hard_exudates": {
+     "aupr": 0.8549500020812923,
+     "threshold": 0.45,
+     "dice": 0.776605573580284,
+     "positive_pixels": 46507
+    },
+    "soft_exudates": {
+     "aupr": 0.734932408232092,
+     "threshold": 0.9,
+     "dice": 0.7322805728975395,
+     "positive_pixels": 8936
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,245 @@
+@import "tailwindcss";
+
+@theme {
+  /* One typeface everywhere: Exo 2 */
+  /* Telugu and Devanagari glyphs fall through to Noto (Exo 2 is Latin-only). */
+  --font-sans: "Exo 2", "Inter", "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, sans-serif;
+  --font-display: "Exo 2", "Inter", "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, sans-serif;
+  --font-mono: "Exo 2", "Inter", "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, sans-serif;
+  /* Hero-only display face */
+  --font-hero: "Exo 2", "Inter", "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, sans-serif;
+
+  /* Cinematic landing palette */
+  --color-void: #03050a;
+  --color-abyss: #070b14;
+  --color-electric: #2979ff;
+  --color-neon: #00a6ff;
+  --color-cyan: #63d9ff;
+  --color-ink: #f5f8ff;
+  --color-haze: #9baac2;
+
+  /* Clinical workspace surfaces */
+  --color-panel: #0b1120;
+  --color-panel-2: #101829;
+  --color-panel-3: #16213a;
+  --color-line: rgb(155 170 194 / 0.14);
+  --color-line-strong: rgb(155 170 194 / 0.26);
+
+  /* Severity (always paired with text) */
+  --color-g0: #3ddc97;
+  --color-g1: #d9d35a;
+  --color-g2: #ffb547;
+  --color-g3: #ff7a45;
+  --color-g4: #ff4d6a;
+  --color-ok: #3ddc97;
+  --color-warn: #ffb547;
+  --color-bad: #ff5c72;
+
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgb(41 121 255 / 0.35);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-neon);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Thin, quiet scrollbars for the clinical workspace */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(155 170 194 / 0.25) transparent;
+}
+
+input[type="range"] {
+  accent-color: var(--color-electric);
+}
+
+/* Clinical workspace: larger, easier-to-read text scale (landing page unaffected). */
+.workspace {
+  --text-xs: 0.875rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.55;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+}
+
+/* Dashboard: every text size +4px over the workspace scale. */
+.dash {
+  --text-xs: 1.125rem;
+  --text-sm: 1.25rem;
+  --text-base: 1.3125rem;
+  --text-lg: 1.5rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.125rem;
+}
+
+/* Glass tiles (as on the landing page): translucent, blurred, hairline icy border. */
+.glass,
+.card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: var(--glass-shadow);
+}
+a.card:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgb(107 155 255 / 0.55);
+}
+
+/* Workspace dark theme: lifted navy surfaces with high-contrast text. */
+.workspace {
+  --color-void: #0b1120;
+  --color-abyss: #0d1424;
+  --color-panel: #141d30;
+  --color-panel-2: rgb(60 90 150 / 0.22);
+  --color-panel-3: rgb(110 150 230 / 0.2);
+  --color-ink: #f3f6fc;
+  --color-haze: #b8c4da;
+  --color-electric: #3b6ef5;
+  --color-neon: #7aa5ff;
+  --color-cyan: #9cc2ff;
+  --color-line: rgb(180 200 235 / 0.16);
+  --color-line-strong: rgb(180 200 235 / 0.3);
+  --color-ok: #4ade9b;
+  --color-warn: #f5b04a;
+  --color-bad: #ff6b7f;
+  --color-g0: #b9d4ff;
+  --color-g1: #7fb2ff;
+  --color-g2: #4a83ed;
+  --color-g3: #245ceb;
+  --color-g4: #ff5c72;
+  --glass-bg: rgb(8 13 28 / 0.55);
+  --glass-bg-hover: rgb(12 20 42 / 0.68);
+  --glass-border: rgb(150 190 255 / 0.2);
+  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 24px 48px -28px rgb(0 0 0 / 0.75);
+  --veil: linear-gradient(180deg, rgb(5 9 20 / 0.55), rgb(5 9 20 / 0.3) 45%, rgb(5 9 20 / 0.5));
+  background: var(--color-void);
+  color: var(--color-ink);
+}
+
+/* Workspace light theme (default): white surfaces, dark navy text, blue accents. */
+:root[data-theme="light"] .workspace {
+  color-scheme: light;
+  --color-void: #f4f7fc;
+  --color-abyss: #eef3fa;
+  --color-ink: #0b1b3a;
+  --color-haze: #3f5170;
+  --color-panel: #ffffff;
+  --color-panel-2: rgb(255 255 255 / 0.55);
+  --color-panel-3: rgb(36 92 235 / 0.1);
+  --color-line: rgb(15 35 75 / 0.12);
+  --color-line-strong: rgb(15 35 75 / 0.24);
+  --color-electric: #245ceb;
+  --color-neon: #245ceb;
+  --color-cyan: #1d4fc4;
+  --color-ok: #15803d;
+  --color-warn: #b45309;
+  --color-bad: #c81e3a;
+  --color-g0: #6e9cf0;
+  --color-g1: #4a83ed;
+  --color-g2: #245ceb;
+  --color-g3: #1a3fb0;
+  --color-g4: #d92d4a;
+  --glass-bg: rgb(255 255 255 / 0.6);
+  --glass-bg-hover: rgb(255 255 255 / 0.78);
+  --glass-border: rgb(255 255 255 / 0.9);
+  --glass-shadow: 0 0 0 1px rgb(15 35 75 / 0.07), 0 18px 40px -24px rgb(30 60 140 / 0.35);
+  --veil: linear-gradient(180deg, rgb(244 247 252 / 0.55), rgb(244 247 252 / 0.25) 45%, rgb(244 247 252 / 0.5));
+}
+
+/* Optical-thread backdrop: a soft veil keeps text readable; light mode inverts the
+   canvas (hue preserved) exactly like the landing page. */
+.workspace .fiber-veil {
+  background: var(--veil);
+}
+:root[data-theme="light"] .workspace .fiber-canvas canvas {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Programmatically focused containers (e.g. <main tabIndex=-1>) get no focus frame. */
+[tabindex="-1"]:focus,
+[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
+/* Landing light theme: light tokens, and the fibre canvas inverted (hue preserved)
+   so the blue strands read as ink on a pale field. */
+:root[data-theme="light"] .landing {
+  color-scheme: light;
+  --color-void: #f3f6fb;
+  --color-abyss: #e8eef7;
+  --color-ink: #0b1426;
+  --color-haze: #44526c;
+  --color-cyan: #0369a1;
+  --color-electric: #2563eb;
+  --color-neon: #0284c7;
+  --color-line: rgb(30 45 80 / 0.14);
+}
+:root[data-theme="light"] .landing canvas {
+  filter: invert(1) hue-rotate(180deg);
+}
+:root[data-theme="light"] .landing [class*="rgba(3,5,10"] {
+  text-shadow: 0 1px 12px rgb(255 255 255 / 0.9);
+}
+
+/* Landing hero: scroll-driven neon fill + glow. --hl (0–1) is set from scroll. */
+.hero-hl {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-cyan) 0%,
+    var(--color-electric) calc(var(--hl, 0) * 100%),
+    var(--color-ink) calc(var(--hl, 0) * 100% + 6%),
+    var(--color-ink) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 calc(6px + var(--hl, 0) * 22px) rgb(41 121 255 / calc(0.3 + var(--hl, 0) * 0.5)));
+}
+
+.skeleton {
+  background: linear-gradient(90deg, rgb(155 170 194 / 0.06), rgb(155 170 194 / 0.14), rgb(155 170 194 / 0.06));
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Telugu and Devanagari letters join into clusters; tracking (letter-spacing) pulls them apart. */
+html:is([lang="te"], [lang="hi"]) * {
+  letter-spacing: 0 !important;
+}

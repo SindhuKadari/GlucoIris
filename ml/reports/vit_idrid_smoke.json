@@ -1,0 +1,157 @@
+{
+ "meta": {
+  "model_name": "vit_tiny_patch16_224.augreg_in21k_ft_in1k",
+  "classes": [
+   "No DR",
+   "Mild NPDR",
+   "Moderate NPDR",
+   "Severe NPDR",
+   "Proliferative DR"
+  ],
+  "img_size": 224,
+  "preprocess": "square fundus crop \u2192 Ben Graham (\u03c3=side/30) \u2192 224px; normalise mean 0.5 std 0.5",
+  "temperature": 20.003684997558594,
+  "referable_threshold": 0.59,
+  "determinable_min": 0.4,
+  "dataset": "idrid",
+  "split": {
+   "train": 42,
+   "val": 9,
+   "test": 9,
+   "seed": 42
+  },
+  "class_balancing": "WeightedRandomSampler (1/sqrt freq) + class-weighted CE, label smoothing 0.10",
+  "augmentation": "RandomResizedCrop(0.8\u20131), H/V flip, rotation 180\u00b0, affine, colour jitter, blur p=0.15",
+  "best_epoch": 1,
+  "val_metrics": {
+   "n": 9,
+   "accuracy": 0.2222222222222222,
+   "macro_f1": 0.07272727272727272,
+   "qwk": 0.0,
+   "per_class_recall": [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   "confusion_matrix": [
+    [
+     0,
+     0,
+     0,
+     2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     2,
+     0
+    ]
+   ],
+   "referable": {
+    "threshold": 0.59,
+    "sensitivity": 1.0,
+    "specificity": 0.0,
+    "auc": 0.6111111111111112,
+    "tp": 6,
+    "fn": 0,
+    "tn": 0,
+    "fp": 3
+   }
+  },
+  "test_metrics": {
+   "n": 9,
+   "accuracy": 0.2222222222222222,
+   "macro_f1": 0.07272727272727272,
+   "qwk": 0.0,
+   "per_class_recall": [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   "confusion_matrix": [
+    [
+     0,
+     0,
+     0,
+     3,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     3,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "referable": {
+    "threshold": 0.59,
+    "sensitivity": 1.0,
+    "specificity": 0.0,
+    "auc": 0.6666666666666666,
+    "tp": 6,
+    "fn": 0,
+    "tn": 0,
+    "fp": 3
+   }
+  },
+  "smoke_test": true,
+  "version": "vit-dr5-idrid-1.0-smoke"
+ },
+ "history": [
+  {
+   "epoch": 1,
+   "train_loss": 1.8211689889431,
+   "val_qwk": 0.0,
+   "val_acc": 0.2222222222222222
+  }
+ ]
+}

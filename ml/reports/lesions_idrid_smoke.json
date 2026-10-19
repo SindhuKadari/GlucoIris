@@ -1,0 +1,108 @@
+{
+ "meta": {
+  "model": "ResUNet(resnet34)",
+  "classes": [
+   "microaneurysms",
+   "haemorrhages",
+   "hard_exudates",
+   "soft_exudates"
+  ],
+  "input": "square fundus crop resized to 1024px RGB, ImageNet normalisation",
+  "size": 1024,
+  "thresholds": {
+   "microaneurysms": 0.5,
+   "haemorrhages": 0.5,
+   "hard_exudates": 0.55,
+   "soft_exudates": 0.5
+  },
+  "best_epoch": 1,
+  "val_metrics": {
+   "microaneurysms": {
+    "aupr": 0.0008966912690236984,
+    "threshold": 0.5,
+    "dice": 9.453630171260692e-05,
+    "positive_pixels": 104
+   },
+   "haemorrhages": {
+    "aupr": 0.06771259087146375,
+    "threshold": 0.5,
+    "dice": 0.0031421479033124514,
+    "positive_pixels": 1788
+   },
+   "hard_exudates": {
+    "aupr": 0.08093376011570355,
+    "threshold": 0.55,
+    "dice": 0.0003394498704295007,
+    "positive_pixels": 392
+   },
+   "soft_exudates": {
+    "aupr": 0.003657181139721226,
+    "threshold": 0.5,
+    "dice": 0.0028208744710860366,
+    "positive_pixels": 2536
+   }
+  },
+  "test_metrics": {
+   "microaneurysms": {
+    "aupr": 0.001058882115203019,
+    "threshold": 0.5,
+    "dice": 9.45654852345997e-05,
+    "positive_pixels": 104
+   },
+   "haemorrhages": {
+    "aupr": 0.060380396381796334,
+    "threshold": 0.5,
+    "dice": 0.002626205496941292,
+    "positive_pixels": 1482
+   },
+   "hard_exudates": {
+    "aupr": 0.06972225586156353,
+    "threshold": 0.55,
+    "dice": 0.0003873212549208659,
+    "positive_pixels": 441
+   },
+   "soft_exudates": {
+    "aupr": 0.004932784357188777,
+    "threshold": 0.5,
+    "dice": 0.003171079752655779,
+    "positive_pixels": 3170
+   }
+  },
+  "dataset": "synthetic (smoke test)",
+  "smoke_test": true,
+  "version": "resunet-lesions-idrid-1.0-smoke"
+ },
+ "history": [
+  {
+   "epoch": 1,
+   "loss": 1.6688801646232605,
+   "val_mAUPR": 0.038300055848978054,
+   "val": {
+    "microaneurysms": {
+     "aupr": 0.0008966912690236984,
+     "threshold": 0.5,
+     "dice": 9.453630171260692e-05,
+     "positive_pixels": 104
+    },
+    "haemorrhages": {
+     "aupr": 0.06771259087146375,
+     "threshold": 0.5,
+     "dice": 0.0031421479033124514,
+     "positive_pixels": 1788
+    },
+    "hard_exudates": {
+     "aupr": 0.08093376011570355,
+     "threshold": 0.55,
+     "dice": 0.0003394498704295007,
+     "positive_pixels": 392
+    },
+    "soft_exudates": {
+     "aupr": 0.003657181139721226,
+     "threshold": 0.5,
+     "dice": 0.0028208744710860366,
+     "positive_pixels": 2536
+    }
+   }
+  }
+ ]
+}
