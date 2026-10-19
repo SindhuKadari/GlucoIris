@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GlucoIris — Presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --void: #03050a; --ink: #f5f8ff; --haze: #9baac2; --electric: #2979ff; --cyan: #63d9ff; --line: rgba(155,170,194,.18);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--void); color: var(--ink); font-family: "Exo 2", system-ui, sans-serif; overflow: hidden; }
+  canvas#stage { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  .slide {
+    position: fixed; inset: 0; padding: 6vh 6vw; display: flex; flex-direction: column; justify-content: flex-end;
+    opacity: 0; transform: translateY(24px); pointer-events: none; transition: opacity .6s ease, transform .6s ease;
+  }
+  .slide.active { opacity: 1; transform: none; pointer-events: auto; }
+  .slide.leaving { opacity: 0; transform: translateY(-16px); transition-duration: .45s; }
+  .eyebrow { font-size: clamp(11px, 1.05vw, 15px); letter-spacing: .28em; text-transform: uppercase; color: var(--cyan); }
+  h1, h2 { font-weight: 300; text-transform: uppercase; letter-spacing: .01em; margin: .3em 0 0; line-height: 1;
+    text-shadow: 0 0 28px rgba(41,121,255,.55), 0 2px 18px rgba(3,5,10,.9); }
+  h1 { font-size: clamp(34px, 5.2vw, 92px); }
+  .slide[data-scene="eye"] { max-width: 58vw; }
+  @media (max-aspect-ratio: 13/10) { .slide[data-scene="eye"] { max-width: none; } }
+  h2 { font-size: clamp(34px, 4.6vw, 72px); }
+  h1 em, h2 em { font-style: italic; text-transform: none; }
+  .lead { margin-top: 1.2em; max-width: 46ch; font-size: clamp(15px, 1.45vw, 22px); line-height: 1.55; color: rgba(245,248,255,.86); text-shadow: 0 1px 14px rgba(3,5,10,.95); }
+  .glass { background: rgba(7,11,20,.55); border: 1px solid rgba(99,217,255,.18); border-radius: 22px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .grid { display: grid; gap: 14px; margin-top: 3.5vh; }
+  .card { padding: 18px 20px; }
+  .card .k { font-size: clamp(11px, .95vw, 14px); letter-spacing: .2em; text-transform: uppercase; color: var(--cyan); opacity: .85; }
+  .card .t { margin-top: 6px; font-size: clamp(16px, 1.5vw, 23px); font-weight: 500; }
+  .card .d { margin-top: 6px; font-size: clamp(13px, 1.15vw, 17px); line-height: 1.5; color: var(--haze); }
+  .metric { font-size: clamp(26px, 2.6vw, 40px); font-weight: 500; color: var(--ink); margin-top: 8px; }
+  .tag { display: inline-block; margin-top: 10px; padding: 3px 10px; border-radius: 999px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; border: 1px solid; }
+  .tag.live { color: #3ddc97; border-color: rgba(61,220,151,.45); }
+  .tag.next { color: #ffb547; border-color: rgba(255,181,71,.45); }
+  .row { display: flex; gap: 4vw; align-items: flex-end; justify-content: space-between; }
+  figure { margin: 0; }
+  figure img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 18px; border: 1px solid rgba(99,217,255,.2); display: block; background: #000; }
+  figcaption { margin-top: 10px; font-size: clamp(12px, 1vw, 15px); color: var(--haze); }
+  /* chrome */
+  .chrome { position: fixed; z-index: 5; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: rgba(155,170,194,.8); pointer-events: none; }
+  .brand { top: 3.4vh; left: 6vw; font-size: 18px; letter-spacing: .06em; color: var(--ink); text-transform: none; font-weight: 500; }
+  .counter { top: 3.6vh; right: 6vw; }
+  .hint { bottom: 2.6vh; right: 6vw; font-size: 11px; }
+  .progress { position: fixed; left: 0; bottom: 0; height: 2px; background: linear-gradient(90deg, var(--electric), var(--cyan)); box-shadow: 0 0 12px var(--cyan); transition: width .8s ease; z-index: 5; }
+  .navzone { position: fixed; top: 0; bottom: 0; width: 18vw; z-index: 4; cursor: pointer; }
+  .navzone.prev { left: 0; } .navzone.next { right: 0; }
+  @media (prefers-reduced-motion: reduce) { .slide { transition: opacity .2s; transform: none !important; } }
+  /* ---- report deck additions ---- */
+  .slide.dense { justify-content: flex-start; padding-top: 9.5vh; padding-bottom: 7.5vh; }
+  .slide.dense h2 { font-size: clamp(28px, 3.3vw, 54px); }
+  .sec { font-size: clamp(10px, .85vw, 13px); letter-spacing: .22em; text-transform: uppercase; color: var(--cyan); margin: 0 0 .7vh; }
+  .cols { display: grid; gap: 1.4vw; margin-top: 2.6vh; align-items: start; }
+  .stack { display: flex; flex-direction: column; gap: 1.1vh; }
+  .card.sm { padding: 1.3vh 1.1vw; border-radius: 16px; }
+  .card.sm .t { font-size: clamp(13px, 1.12vw, 18px); margin-top: 2px; }
+  .card.sm .d { font-size: clamp(11px, .86vw, 14px); margin-top: 3px; line-height: 1.4; }
+  .big { font-size: clamp(20px, 2.1vw, 34px); font-weight: 500; color: var(--ink); line-height: 1.05; text-shadow: 0 0 18px rgba(99,217,255,.45); }
+  .big small { font-size: .5em; color: var(--haze); font-weight: 400; margin-left: .3em; }
+  .hl { color: #63d9ff; font-weight: 600; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px; font-size: clamp(10px, .82vw, 13px); border: 1px solid rgba(99,217,255,.3); color: var(--ink); background: rgba(41,121,255,.12); }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1vh; }
+  .steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .6vw; }
+  .step { padding: 1.1vh .8vw; border-radius: 14px; }
+  .step .n { font-size: clamp(10px, .8vw, 12px); color: var(--cyan); letter-spacing: .18em; }
+  .step .t { font-size: clamp(12px, 1vw, 16px); font-weight: 500; margin-top: 2px; }
+  .step .d { font-size: clamp(10px, .78vw, 12.5px); color: var(--haze); margin-top: 2px; line-height: 1.35; }
+  .diagram { background: #fbfcff; border-radius: 16px; padding: .8vh .6vw; border: 1px solid rgba(99,217,255,.25); }
+  .diagram img { width: 100%; aspect-ratio: auto; border: 0; background: none; max-height: 58vh; object-fit: contain; display: block; border-radius: 10px; }
+  /* bar chart */
+  .bars { display: flex; flex-direction: column; gap: .9vh; margin-top: .6vh; }
+  .bar { display: grid; grid-template-columns: 8.5vw 1fr 3.4vw; align-items: center; gap: .6vw; font-size: clamp(11px, .85vw, 14px); color: var(--haze); }
+  .bar .track { height: 1.3vh; min-height: 9px; border-radius: 99px; background: rgba(155,170,194,.14); overflow: hidden; }
+  .bar .fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #2979ff, #00a6ff); }
+  .bar.top .fill { background: linear-gradient(90deg, #00a6ff, #63d9ff); box-shadow: 0 0 12px rgba(99,217,255,.7); }
+  .bar .v { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 500; }
+  table.m { width: 100%; border-collapse: collapse; font-size: clamp(11px, .85vw, 14px); margin-top: .6vh; }
+  table.m th, table.m td { padding: .55vh .5vw; text-align: right; border-bottom: 1px solid rgba(155,170,194,.15); font-variant-numeric: tabular-nums; }
+  table.m th:first-child, table.m td:first-child { text-align: left; color: var(--haze); }
+  table.m th { color: var(--cyan); font-weight: 500; font-size: .9em; letter-spacing: .06em; }
+  table.m td.hl { color: #63d9ff; font-weight: 600; }
+  /* image slots: show a labelled placeholder until the file exists */
+  .shots { display: grid; gap: .8vw; }
+  .slot { margin: 0; }
+  .slot img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 14px; border: 1px solid rgba(99,217,255,.22); display: block; background: #000; }
+  .slot.wide img { aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+  .slot .ph { display: none; aspect-ratio: 1; border-radius: 14px; border: 1.5px dashed rgba(99,217,255,.45); color: var(--haze); font-size: clamp(10px, .8vw, 13px); align-items: center; justify-content: center; text-align: center; padding: 8px; background: rgba(7,11,20,.45); }
+  .slot.wide .ph { aspect-ratio: 16 / 10; }
+  .slot.missing img { display: none; }
+  .slot.missing .ph { display: flex; }
+  .slot figcaption { margin-top: 5px; font-size: clamp(10px, .78vw, 12.5px); line-height: 1.35; }
+  .vs { display: grid; grid-template-columns: auto 1fr; gap: .4vh .7vw; align-items: start; font-size: clamp(11px, .85vw, 14px); }
+  .vs .c { color: #ffb547; } .vs .mtg { color: var(--ink); }
+  .refs { margin: 1.6vh 0 0; padding-left: 1.3em; font-size: clamp(11px, .9vw, 15px); line-height: 1.45; color: rgba(245,248,255,.86); }
+  .refs li { margin-bottom: .55vh; } .refs i { color: var(--haze); }
+  .team { display: grid; grid-template-columns: auto 1fr; gap: .7vh 1.4vw; font-size: clamp(13px, 1.1vw, 18px); margin-top: 2.2vh; padding: 2vh 1.6vw; max-width: 48vw; }
+  .team dt { color: var(--cyan); letter-spacing: .14em; text-transform: uppercase; font-size: .78em; padding-top: .2em; }
+  .team dd { margin: 0; color: var(--ink); }
+  .note { font-size: clamp(10px, .78vw, 12.5px); color: var(--haze); margin-top: .8vh; }
+  /* model flow (slide 2) */
+  .flow { display: flex; align-items: stretch; gap: .5vw; margin-top: .5vh; max-width: 82vw; }
+  .flow .node { flex: 1 1 0; }
+  .flow .node.model { border-color: rgba(99,217,255,.5); box-shadow: inset 0 0 22px rgba(41,121,255,.22), 0 0 16px rgba(41,121,255,.18); }
+  .flow .node .hl { display: block; margin-top: 4px; font-size: clamp(11px, .86vw, 14px); }
+  .flow .arr { align-self: center; color: var(--cyan); font-size: clamp(14px, 1.3vw, 22px); text-shadow: 0 0 10px var(--cyan); }
+  /* architecture diagram (slide 3) */
+  .arch { margin: 0; padding: .8vh .6vw; }
+  .arch svg { width: 100%; height: auto; display: block; max-height: 52vh; font-family: "Exo 2", system-ui, sans-serif; }
+  .arch .tier { fill: rgba(41,121,255,.07); stroke: rgba(99,217,255,.35); }
+  .arch .box { fill: rgba(7,11,20,.7); stroke: rgba(99,217,255,.6); }
+  .arch .box.gate { stroke: rgba(255,181,71,.7); }
+  .arch .pill-g rect { fill: rgba(41,121,255,.18); stroke: rgba(99,217,255,.45); }
+  .arch .pill-g text { fill: #f5f8ff; font-size: 12.5px; text-anchor: middle; }
+  .arch .link line { stroke: #63d9ff; stroke-width: 1.6; }
+  .arch .lbl { fill: #63d9ff; font-size: 11px; letter-spacing: .16em; font-weight: 500; }
+  .arch .sub { fill: #9baac2; font-size: 10.5px; }
+  .arch .mono { fill: #f5f8ff; font-size: 11.5px; font-family: ui-monospace, Consolas, monospace; }
+  .arch .n { fill: #63d9ff; font-size: 10px; letter-spacing: .14em; }
+  .arch .t { fill: #f5f8ff; font-size: 13px; font-weight: 600; }
+  .arch .s { fill: #9baac2; font-size: 10.5px; }
+  /* tech stack (slide 3) */
+  .tech .grp { margin-top: 1.1vh; font-size: clamp(10px, .78vw, 12.5px); color: var(--haze); letter-spacing: .14em; text-transform: uppercase; }
+  .ttiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6vh .5vw; margin-top: .6vh; }
+  .tt { display: flex; align-items: center; gap: .55vw; padding: .7vh .55vw; border-radius: 12px; background: rgba(41,121,255,.08); border: 1px solid rgba(99,217,255,.2); }
+  .tt svg { width: clamp(20px, 1.75vw, 30px); height: clamp(20px, 1.75vw, 30px); flex: none; }
+  .tt b { display: block; font-weight: 500; font-size: clamp(12px, .98vw, 16px); color: var(--ink); line-height: 1.15; }
+  .tt span { font-size: clamp(10px, .74vw, 12px); color: var(--haze); }
+  /* auto-fit wrapper + hover lightbox */
+  .fit { width: 100%; }
+  img.zoomable { cursor: zoom-in; }
+  .lightbox { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2vh; background: rgba(3,5,10,.84); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+  .lightbox.on { opacity: 1; pointer-events: auto; cursor: zoom-out; }
+  .lightbox img { max-width: 94vw; max-height: 86vh; object-fit: contain; border-radius: 14px; border: 1px solid rgba(99,217,255,.35); box-shadow: 0 0 40px rgba(41,121,255,.35); transform: scale(.9); transition: transform .3s ease; }
+  .lightbox.on img { transform: none; }
+  .lightbox .cap { color: var(--haze); font-size: clamp(12px, 1vw, 16px); letter-spacing: .04em; }
+  /* slides 4–5: icons, challenge/mitigation rows, feasibility hub */
+  .ic { width: clamp(18px, 1.45vw, 26px); height: clamp(18px, 1.45vw, 26px); flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .lab { display: inline-flex; align-items: center; gap: .5vw; padding: .5vh .9vw; border-radius: 999px; font-size: clamp(11px, .9vw, 15px); letter-spacing: .16em; text-transform: uppercase; font-weight: 500; }
+  .lab .ic { width: 1.35em; height: 1.35em; }
+  .lab.red { color: #ff8a8a; background: rgba(255,107,107,.1); border: 1px solid rgba(255,107,107,.38); }
+  .lab.green { color: #3ddc97; background: rgba(61,220,151,.1); border: 1px solid rgba(61,220,151,.38); }
+  .lab.blue { color: var(--cyan); background: rgba(41,121,255,.12); border: 1px solid rgba(99,217,255,.35); }
+  .cm { display: grid; grid-template-columns: 1fr 1.4vw 1.3fr; gap: .4vw; align-items: center; }
+  .cm.row { align-items: stretch; margin-top: .6vh; }
+  .cm .arrow, .aud .arrow { align-self: center; text-align: center; color: var(--cyan); text-shadow: 0 0 8px var(--cyan); }
+  .it { display: flex; gap: .6vw; align-items: flex-start; }
+  .it > div { flex: 1; min-width: 0; }
+  .it .ic { margin-top: 2px; }
+  .card.sm.it .t { margin-top: 0; }
+  .chal { border-color: rgba(255,107,107,.32); } .chal .ic { color: #ff8a8a; }
+  .mit { border-color: rgba(61,220,151,.34); } .mit .ic { color: #3ddc97; }
+  .cm.row .card.sm { padding: .9vh .8vw; }
+  img.mini { width: clamp(48px, 4.6vw, 84px); aspect-ratio: 1; object-fit: cover; object-position: left; border-radius: 8px; border: 1px solid rgba(99,217,255,.3); flex: none; align-self: center; }
+  .hub { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5vw; }
+  .hub .f { padding: 1vh .6vw; border-radius: 14px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .hub .f .ic { color: var(--cyan); margin-bottom: 2px; }
+  .hub .f .t { font-size: clamp(12px, .92vw, 15px); font-weight: 500; }
+  .hub .f .d { font-size: clamp(10px, .74vw, 12px); color: var(--haze); line-height: 1.3; }
+  .hub .core { display: flex; align-items: center; justify-content: center; }
+  .hub .ring { width: 100%; max-width: 11vw; aspect-ratio: 1; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: .5vw; border: 1.5px solid rgba(99,217,255,.6); background: radial-gradient(circle, rgba(41,121,255,.3), rgba(7,11,20,.75) 70%); box-shadow: 0 0 28px rgba(41,121,255,.45), inset 0 0 18px rgba(99,217,255,.25); }
+  .hub .ring .ic { width: 2.2vw; height: 2.2vw; color: var(--cyan); }
+  .hub .ring b { font-size: clamp(14px, 1.2vw, 20px); font-weight: 600; margin-top: 3px; }
+  .hub .ring span { font-size: clamp(9px, .66vw, 11px); color: var(--haze); line-height: 1.2; }
+  .tagline { display: flex; justify-content: space-between; align-items: center; gap: 1.5vw; margin-top: 1.4vh; font-size: clamp(12px, .95vw, 16px); }
+  .tagline .vals { display: flex; gap: 1.2vw; color: var(--cyan); font-size: .82em; letter-spacing: .12em; text-transform: uppercase; flex: none; }
+  .tagline .vals span { display: inline-flex; align-items: center; gap: .35vw; }
+  .tagline .ic { width: 1.25em; height: 1.25em; }
+  .aud { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1vh .4vw; margin-top: 1.2vh; }
+  .aud .a { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1.1vh .5vw; border-radius: 14px; background: rgba(41,121,255,.08); border: 1px solid rgba(99,217,255,.22); }
+  .aud .a .ic { width: clamp(26px, 2.2vw, 38px); height: clamp(26px, 2.2vw, 38px); color: var(--cyan); margin-bottom: 4px; }
+  .card .aud .t { font-size: clamp(12px, .98vw, 16px); font-weight: 500; margin-top: 0; }
+  .card .aud .d { font-size: clamp(10px, .78vw, 13px); margin-top: 2px; }
+  .ben, .fut { display: grid; grid-template-columns: 1fr 1fr; gap: .8vh .6vw; margin-top: 1.2vh; }
+  .ben .it, .fut .it { padding: .8vh .6vw; border-radius: 12px; background: rgba(41,121,255,.07); border: 1px solid rgba(99,217,255,.18); }
+  .ben .ic { color: #3ddc97; } .fut .ic { color: var(--cyan); }
+  .card .ben .t, .card .fut .t { font-size: clamp(12px, .95vw, 16px); font-weight: 500; margin-top: 0; }
+  .card .ben .d, .card .fut .d { font-size: clamp(10px, .76vw, 12.5px); margin-top: 1px; line-height: 1.3; }
+</style>
+</head>
+<body>
+<canvas id="stage" aria-hidden="true"></canvas>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></symbol><symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="i-camoff" viewBox="0 0 24 24"><path d="M2 2l20 20M7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16M9.5 4h5L17 7h3a2 2 0 0 1 2 2v7.5M14.12 15.12A3 3 0 1 1 9.88 10.88"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol><symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5M3 12a9 3 0 0 0 18 0"/></symbol><symbol id="i-scale" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1ZM2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1ZM7 21h10M12 3v18M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></symbol><symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16ZM3.3 7l8.7 5 8.7-5M12 22V12"/></symbol><symbol id="i-layers" viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83ZM22 17.65l-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65M22 12.65l-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></symbol><symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="i-wifioff" viewBox="0 0 24 24"><path d="M12 20h.01M8.5 16.43a5 5 0 0 1 7 0M2 8.82a15 15 0 0 1 4.17-2.65M10.66 5c4.01-.36 8.14.9 11.34 3.76M16.85 11.25a10 10 0 0 1 2.22 1.68M5 12.86a10 10 0 0 1 5.17-2.69M2 2l20 20"/></symbol><symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4M9 10l2 2 4-4"/></symbol><symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></symbol><symbol id="i-flask" viewBox="0 0 24 24"><path d="M10 2v7.31M14 9.3V2M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0M5.52 16h12.96"/></symbol><symbol id="i-zap" viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></symbol><symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-rupee" viewBox="0 0 24 24"><path d="M6 3h12M6 8h12M6 13l8.5 8M6 13h3M9 13c6.67 0 6.67-10 0-10"/></symbol><symbol id="i-tent" viewBox="0 0 24 24"><path d="M3.5 21 14 3M20.5 21 10 3M15.5 21 12 15l-3.5 6M2 21h20"/></symbol><symbol id="i-siren" viewBox="0 0 24 24"><path d="M7 18v-6a5 5 0 1 1 10 0v6M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2zM21 12h1M18.5 4.5 18 5M2 12h1M12 2v1M4.93 4.93l.71.71"/></symbol><symbol id="i-steth" viewBox="0 0 24 24"><path d="M11 2v2M5 2v2M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></symbol><symbol id="i-expand" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol><symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10ZM2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></symbol><symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.99-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 14.99 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol><symbol id="i-star" viewBox="0 0 24 24"><path d="M11.5 2.3a.5.5 0 0 1 .9 0l2.3 4.7a2 2 0 0 0 1.6 1.1l5.2.8a.5.5 0 0 1 .3.9l-3.8 3.7a2 2 0 0 0-.6 1.9l.9 5.2a.5.5 0 0 1-.8.5l-4.6-2.4a2 2 0 0 0-1.9 0l-4.6 2.4a.5.5 0 0 1-.8-.5l.9-5.2a2 2 0 0 0-.6-1.9L2.2 9.8a.5.5 0 0 1 .3-.9l5.2-.8a2 2 0 0 0 1.6-1.1z"/></symbol><symbol id="i-hospital" viewBox="0 0 24 24"><path d="M12 6v4M14 14h-4M14 18h-4M14 8h-4M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"/></symbol><symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="i-xcircle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></symbol><symbol id="i-headset" viewBox="0 0 24 24"><path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3ZM21 16v2a4 4 0 0 1-4 4h-5"/></symbol><symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol><symbol id="i-lang" viewBox="0 0 24 24"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></symbol><symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol><symbol id="i-bars" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16M7 16v-3M12 16V9M17 16V5"/></symbol><symbol id="i-video" viewBox="0 0 24 24"><path d="m16 13 5.22 3.48a.5.5 0 0 0 .78-.42V7.89a.5.5 0 0 0-.75-.43L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol></defs></svg>
+
+<div class="chrome brand">(GLUCOIRIS)</div>
+<div class="chrome counter" id="counter">[ 01 / 06 ]</div>
+<div class="chrome hint">← → or click · F full screen · move the cursor</div>
+<div class="progress" id="progress"></div>
+<div class="navzone prev" id="navPrev" title="Previous"></div>
+<div class="navzone next" id="navNext" title="Next"></div>
+
+<!-- 1 · Pitch deck + team details (eye) -->
+<section class="slide" data-scene="eye">
+  <div class="eyebrow">HACK-X · SU Knowledge Hub Foundation · Pitch deck</div>
+  <h1>GlucoIris // <em>explainable</em> DR screening</h1>
+  <dl class="glass team">
+    <dt>Team name</dt><dd>GlucoIris</dd>
+    <dt>Team ID</dt><dd>IF26-0118</dd>
+    <dt>Theme</dt><dd>HealthCare / HealthTech</dd>
+    <dt>Problem statement</dt><dd>“An Integrated AI-Framework for Explainable Diabetic Retinopathy Screening”</dd>
+  </dl>
+</section>
+
+<!-- 2 · Idea title -->
+<section class="slide dense" data-scene="ambRight">
+  <div class="eyebrow">( 01 ) Idea title</div>
+  <h2>One fundus image → <em>a verdict</em> you can check</h2>
+  <p class="lead" style="max-width: 80ch; font-size: clamp(13px, 1.1vw, 17px); margin-top: .8em">One retinal fundus image is quality-checked, analysed by four trained models with visual evidence, signed by a clinician and returned as a report in the patient's language.</p>
+  <div class="cols" style="grid-template-columns: 1fr 1fr 1.1fr; max-width: 74vw">
+    <div class="glass card sm"><div class="k">The problem</div><div class="t">Screening does not scale</div><div class="d">DR is a leading cause of preventable blindness; specialists are scarce, unusable images reach classifiers, and a bare AI score gives the clinician nothing to verify.</div></div>
+    <div class="glass card sm"><div class="k">Our idea</div><div class="t">Gate · explain · sign off</div><div class="d">Block bad images first, show <span class="hl">where</span> the model looked (Grad-CAM, lesion boxes, vessels), keep the model output apart from the clinician's signed grade.</div></div>
+    <div class="glass card sm"><div class="k">Objectives</div><div class="d" style="margin-top: 5px">① Guided capture-to-report workflow<br />② Block unusable images<br />③ Real models with visible evidence<br />④ Separate model output from sign-off<br />⑤ Obvious verdict in EN · తెలుగు · हिन्दी<br />⑥ Honest — nothing simulated is passed off as real</div></div>
+  </div>
+  <div class="sec" style="margin-top: 2.2vh">The four trained models · run on every image</div>
+  <div class="flow">
+    <div class="glass card sm node"><div class="k">Input</div><div class="t">Fundus image</div><div class="d">Passes the quality gate first</div></div>
+    <span class="arr">→</span>
+    <div class="glass card sm node model"><div class="k">① Detect</div><div class="t">EfficientNet-B4</div><div class="d">Any DR · P(DR) + Grad-CAM boxes</div><span class="hl">AUC 0.870 · sens 94.2%</span></div>
+    <span class="arr">→</span>
+    <div class="glass card sm node model"><div class="k">② Grade</div><div class="t">ViT-S/16</div><div class="d">5-class grade + referable score</div><span class="hl">Referable AUC 0.897</span></div>
+    <span class="arr">→</span>
+    <div class="glass card sm node model"><div class="k">③ Locate</div><div class="t">Lesion U-Net</div><div class="d">MA · HE · EX · SE masks → boxes</div><span class="hl">Mean AUPR 0.662</span></div>
+    <span class="arr">→</span>
+    <div class="glass card sm node model"><div class="k">④ Map</div><div class="t">Vessel U-Net</div><div class="d">Vessel mask + density (DRIVE)</div><span class="hl">AUC 0.983 · Dice 0.820</span></div>
+    <span class="arr">→</span>
+    <div class="glass card sm node"><div class="k">Output</div><div class="t">Verdict + evidence</div><div class="d">Clinician signs · PDF in EN / TE / HI</div></div>
+  </div>
+  <div class="sec" style="margin-top: 2vh">Headline results · held-out test sets</div>
+  <div class="cols" style="grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 74vw; margin-top: .4vh">
+    <div class="glass card sm"><div class="k">DR screen · B4</div><div class="big">94.2%<small>sensitivity</small></div><div class="d">AUC 0.870 · IDRiD external, 103 images</div></div>
+    <div class="glass card sm"><div class="k">Referable · ViT</div><div class="big">0.897<small>AUC</small></div><div class="d">Sens 90.6% · spec 56.4%</div></div>
+    <div class="glass card sm"><div class="k">Vessels · U-Net</div><div class="big">0.983<small>AUC</small></div><div class="d">Dice 0.820 · DRIVE 37–40</div></div>
+    <div class="glass card sm"><div class="k">Lesions · U-Net</div><div class="big">0.859<small>AUPR · EX</small></div><div class="d">Mean AUPR 0.662 · IDRiD, 27 images</div></div>
+    <div class="glass card sm"><div class="k">Quality gate</div><div class="big">92.6%<small>pass</small></div><div class="d">Real IDRiD images; 7 of 11 degradations blocked</div></div>
+  </div>
+</section>
+
+<!-- 3 · Methodology & technical approach -->
+<section class="slide dense" data-scene="ambBottom">
+  <div class="eyebrow">( 02 ) Methodology &amp; technical approach</div>
+  <h2>Five steps, <em>four</em> trained models</h2>
+  <div class="steps" style="margin-top: 2.4vh">
+    <div class="glass step"><div class="n">01 · ACQUIRE</div><div class="t">One fundus image</div><div class="d">Upload / camera / sample, linked to a patient record.</div></div>
+    <div class="glass step"><div class="n">02 · QUALITY</div><div class="t">Classical gate</div><div class="d">9 checks: sharpness, brightness, contrast, glare, noise, field, resolution… → acceptable / borderline / ungradeable.</div></div>
+    <div class="glass step"><div class="n">03 · ANALYSE</div><div class="t">FastAPI + PyTorch</div><div class="d">B4 + ViT + lesion + vessel models, ≈ 5 s on CPU.</div></div>
+    <div class="glass step"><div class="n">04 · REVIEW</div><div class="t">Clinician sign-off</div><div class="d">3 evidence panels; signed grade stored apart from model output.</div></div>
+    <div class="glass step"><div class="n">05 · REPORT</div><div class="t">PDF · EN / TE / HI</div><div class="d">Red / green / amber verdict banner with every heatmap.</div></div>
+  </div>
+  <div class="cols" style="grid-template-columns: 1.45fr 1fr; margin-top: 1.8vh">
+    <figure class="diagram"><img class="zoomable" src="assets/workflow.png" alt="GlucoIris complete app workflow: sign in, patient, acquire, quality gate, four models, visual evidence, clinician review, sign and download report" /></figure>
+    <div class="glass card sm tech">
+      <div class="k">Tech stack</div>
+      <div class="grp">Frontend · browser</div>
+      <div class="ttiles">
+          <div class="tt"><svg viewBox="-12 -12 24 24"><g fill="none" stroke="#61dafb" stroke-width="1.2"><ellipse rx="10" ry="4"/><ellipse rx="10" ry="4" transform="rotate(60)"/><ellipse rx="10" ry="4" transform="rotate(120)"/></g><circle r="2" fill="#61dafb"/></svg><div><b>React 19</b><span>UI components</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24"><rect width="24" height="24" rx="3" fill="#3178c6"/><text x="21.5" y="20.5" text-anchor="end" font-size="11" font-weight="700" fill="#fff" font-family="Arial, sans-serif">TS</text></svg><div><b>TypeScript</b><span>typed frontend</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24"><path d="M1.5 4L12 22.5 22.5 4z" fill="#646cff"/><path d="M13.5 1.5L7 13h4.2l-2 9.5L17.5 9h-4.3l3-7.5z" fill="#ffc517"/></svg><div><b>Vite 8</b><span>dev server · build</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24"><path fill="#38bdf8" d="M12 6c-2.7 0-4.3 1.3-5 4 1-1.3 2.2-1.8 3.5-1.5.8.2 1.3.7 1.9 1.3 1 1 2 2.2 4.6 2.2 2.7 0 4.3-1.3 5-4-1 1.3-2.2 1.8-3.5 1.5-.8-.2-1.3-.7-1.9-1.3C15.6 7.2 14.6 6 12 6zm-5 6c-2.7 0-4.3 1.3-5 4 1-1.3 2.2-1.8 3.5-1.5.8.2 1.3.7 1.9 1.3 1 1 2 2.2 4.6 2.2 2.7 0 4.3-1.3 5-4-1 1.3-2.2 1.8-3.5 1.5-.8-.2-1.3-.7-1.9-1.3C10.6 13.2 9.6 12 7 12z"/></svg><div><b>Tailwind CSS 4</b><span>styling · themes</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24"><circle cx="5.5" cy="5.5" r="3.3" fill="#7a4a22"/><circle cx="18.5" cy="5.5" r="3.3" fill="#7a4a22"/><circle cx="12" cy="13" r="9.5" fill="#a0693a"/><ellipse cx="12" cy="16.3" rx="4.3" ry="3.2" fill="#e8c39e"/><circle cx="8.3" cy="11" r="1.3" fill="#111"/><circle cx="15.7" cy="11" r="1.3" fill="#111"/><circle cx="12" cy="15.2" r="1.3" fill="#111"/></svg><div><b>Zustand</b><span>app state</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24" fill="none" stroke="#63d9ff" stroke-width="1.6"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><div><b>IndexedDB</b><span>records + audit log</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24"><path d="M5 1.5h10l5 5v16H5z" fill="#e5484d"/><path d="M15 1.5v5h5" fill="#ffa3a5"/><text x="12.5" y="18" text-anchor="middle" font-size="6.5" font-weight="700" fill="#fff" font-family="Arial, sans-serif">PDF</text></svg><div><b>jsPDF</b><span>signed PDF reports</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24" fill="none" stroke="#63d9ff" stroke-width="1.5"><circle cx="12" cy="12" r="9.5"/><ellipse cx="12" cy="12" rx="4" ry="9.5"/><path d="M2.5 12h19M4 7h16M4 17h16"/></svg><div><b>i18n · 618 strings</b><span>EN · TE · HI</span></div></div>
+      </div>
+      <div class="grp">Backend · ML</div>
+      <div class="ttiles">
+          <div class="tt"><svg viewBox="0 0 24 24"><path d="M11.8 2C7 2 7.3 4.1 7.3 4.1v2.2h4.6V7H5.4S2 6.6 2 11.9s2.9 5.1 2.9 5.1h1.8v-2.5s-.1-2.9 2.9-2.9h4.9s2.8 0 2.8-2.7V4.5S17.7 2 11.8 2zM9.2 3.5a.9.9 0 110 1.8.9.9 0 010-1.8z" fill="#3776ab"/><path d="M12.2 22c4.8 0 4.5-2.1 4.5-2.1v-2.2h-4.6V17h6.5s3.4.4 3.4-4.9-2.9-5.1-2.9-5.1h-1.8v2.5s.1 2.9-2.9 2.9H9.5s-2.8 0-2.8 2.7v4.4S6.3 22 12.2 22zm2.6-1.5a.9.9 0 110-1.8.9.9 0 010 1.8z" fill="#ffd43b"/></svg><div><b>Python 3.12</b><span>ML + service</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#009688"/><path d="M13.2 3.8L6.8 13.4h4.6L10.2 20.2l7-10.1h-4.6z" fill="#fff"/></svg><div><b>FastAPI</b><span>REST API</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.6"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><circle cx="7" cy="7.5" r="1" fill="#c084fc"/><circle cx="7" cy="16.5" r="1" fill="#c084fc"/></svg><div><b>Uvicorn</b><span>ASGI server</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24"><path d="M12.4 2.5L7.1 7.8a7 7 0 109.9 0l-1.6 1.6a4.7 4.7 0 11-6.6 0l3.6-3.6.5-.6z" fill="#ee4c2c"/><circle cx="15.4" cy="5.9" r="1.3" fill="#ee4c2c"/></svg><div><b>PyTorch</b><span>models · Grad-CAM</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffd21e"/><circle cx="8.5" cy="10" r="1.3" fill="#3a3b45"/><circle cx="15.5" cy="10" r="1.3" fill="#3a3b45"/><path d="M8 14c1 2 2.4 3 4 3s3-1 4-3" stroke="#3a3b45" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg><div><b>timm</b><span>ViT-S/16 backbone</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><circle cx="12" cy="6.5" r="4" stroke="#ff3b30"/><circle cx="6" cy="17" r="4" stroke="#34c759"/><circle cx="18" cy="17" r="4" stroke="#2f7cf6"/></svg><div><b>OpenCV</b><span>quality gate · overlays</span></div></div>
+          <div class="tt"><svg viewBox="0 0 24 24"><path d="M12 2l9 5-9 5-9-5z" fill="#4dabcf"/><path d="M3 7l9 5v10l-9-5z" fill="#4d77cf"/><path d="M21 7l-9 5v10l9-5z" fill="#0b4a63"/></svg><div><b>NumPy · Pillow</b><span>image arrays</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · Feasibility, viability & challenges -->
+<section class="slide dense" data-scene="ambLeft">
+  <div class="eyebrow">( 03 ) Feasibility, viability &amp; challenges</div>
+  <h2>Real-world <em>ready</em>, honestly tested</h2>
+  <div class="cols" style="grid-template-columns: 1.3fr 1fr; margin-top: 2vh">
+    <!-- challenges → mitigations -->
+    <div>
+      <div class="cm">
+        <span class="lab red"><svg class="ic"><use href="#i-alert" /></svg>Challenges</span><span></span><span class="lab green"><svg class="ic"><use href="#i-shield" /></svg>Mitigations</span>
+      </div>
+      <div class="cm row">
+        <div class="glass card sm chal it"><svg class="ic"><use href="#i-camoff" /></svg><div><div class="t">Poor image quality</div><div class="d">Blur, low light, under / over-exposure, black borders, low resolution.</div></div></div>
+        <span class="arrow">→</span>
+        <div class="glass card sm mit it"><svg class="ic"><use href="#i-sliders" /></svg><div><div class="t">Quality gate + guided recapture</div><div class="d">Rule-based checks on 9 dimensions; poor images sent back for recapture. <span class="hl">92.6% real pass · 7 / 11 defects blocked</span></div></div></div>
+      </div>
+      <div class="cm row">
+        <div class="glass card sm chal it"><svg class="ic"><use href="#i-db" /></svg><div><div class="t">Class imbalance</div><div class="d">Few severe / proliferative samples can bias the model.</div></div></div>
+        <span class="arrow">→</span>
+        <div class="glass card sm mit it"><svg class="ic"><use href="#i-scale" /></svg><div><div class="t">Weighted training</div><div class="d">Class weights in the loss, class-balanced sampling, stratified data splits, augmentation.</div></div></div>
+      </div>
+      <div class="cm row">
+        <div class="glass card sm chal it"><svg class="ic"><use href="#i-box" /></svg><div><div class="t">Black-box predictions</div><div class="d">Clinicians need the reasoning behind AI decisions.</div></div></div>
+        <span class="arrow">→</span>
+        <div class="glass card sm mit it"><svg class="ic"><use href="#i-layers" /></svg><div><div class="t">Grad-CAM explainability</div><div class="d">Heatmaps + ranked boxes show model attention; lesion boxes shown separately. Builds clinician trust.</div></div><img class="zoomable mini" src="assets/review_panels.jpg" alt="Review screen: Grad-CAM EfficientNet-B4, Grad-CAM ViT and lesion U-Net panels" /></div>
+      </div>
+      <div class="cm row">
+        <div class="glass card sm chal it"><svg class="ic"><use href="#i-target" /></svg><div><div class="t">False positives / negatives</div><div class="d">Unnecessary referrals or missed cases.</div></div></div>
+        <span class="arrow">→</span>
+        <div class="glass card sm mit it"><svg class="ic"><use href="#i-check" /></svg><div><div class="t">High-sensitivity screen + sign-off</div><div class="d">B4 misses only 4 of 69 DR eyes (<span class="hl">94.2% sens</span>); re-calibrated threshold gives <span class="hl">81% / 82%</span>; a clinician signs every result.</div></div></div>
+      </div>
+      <div class="cm row">
+        <div class="glass card sm chal it"><svg class="ic"><use href="#i-wifioff" /></svg><div><div class="t">Low connectivity</div><div class="d">Rural camps may have no reliable internet.</div></div></div>
+        <span class="arrow">→</span>
+        <div class="glass card sm mit it"><svg class="ic"><use href="#i-monitor" /></svg><div><div class="t">Offline-ready architecture</div><div class="d">Models run locally on a CPU; records stay on the device. Cloud sync when online is planned.</div></div></div>
+      </div>
+      <div class="cm row">
+        <div class="glass card sm chal it"><svg class="ic"><use href="#i-globe" /></svg><div><div class="t">Domain shift &amp; generalisation</div><div class="d">Different cameras and regions change model behaviour.</div></div></div>
+        <span class="arrow">→</span>
+        <div class="glass card sm mit it"><svg class="ic"><use href="#i-flask" /></svg><div><div class="t">External validation &amp; field testing</div><div class="d">Tested on 103 unseen IDRiD images (<span class="hl">AUC 0.870</span>); field evaluation before deployment.</div></div></div>
+      </div>
+    </div>
+    <!-- feasibility hub -->
+    <div class="stack">
+      <span class="lab blue" style="align-self: flex-start"><svg class="ic"><use href="#i-zap" /></svg>Feasibility &amp; viability</span>
+      <div class="hub">
+        <div class="glass f"><svg class="ic"><use href="#i-phone" /></svg><div class="t">20D lens + smartphone</div><div class="d">Low-cost imaging (planned kit)</div></div>
+        <div class="glass f"><svg class="ic"><use href="#i-eye" /></svg><div class="t">High accuracy</div><div class="d"><span class="hl">94.2%</span> sensitivity · AUC up to 0.983</div></div>
+        <div class="glass f"><svg class="ic"><use href="#i-rupee" /></svg><div class="t">Low-cost</div><div class="d">Target ≤ ₹10,000 · runs on CPU</div></div>
+        <div class="glass f"><svg class="ic"><use href="#i-tent" /></svg><div class="t">Rural-friendly</div><div class="d">Portable, compact for camps</div></div>
+        <div class="core"><div class="ring"><svg class="ic"><use href="#i-eye" /></svg><b>GlucoIris</b><span>AI-driven screening prototype</span></div></div>
+        <div class="glass f"><svg class="ic"><use href="#i-siren" /></svg><div class="t">Early detection</div><div class="d">Quick high-risk identification</div></div>
+        <div class="glass f"><svg class="ic"><use href="#i-zap" /></svg><div class="t">Quick screening</div><div class="d">Result in <span class="hl">≈ 5 s</span> per image</div></div>
+        <div class="glass f"><svg class="ic"><use href="#i-steth" /></svg><div class="t">Health-worker assisted</div><div class="d">Supports frontline staff</div></div>
+        <div class="glass f"><svg class="ic"><use href="#i-expand" /></svg><div class="t">Scalable</div><div class="d">Browser app + one service</div></div>
+      </div>
+      <div class="glass card sm it" style="align-items: center"><svg class="ic"><use href="#i-phone" /></svg><div class="t" style="margin: 0">Mobile-friendly app — <span class="hl">Simple · Accurate · Accessible</span></div></div>
+    </div>
+  </div>
+  <div class="glass card sm tagline">
+    <span>We don't just build a model — we build a <span class="hl">responsible, reliable and real-world ready</span> screening system.</span>
+    <span class="vals"><span><svg class="ic"><use href="#i-shield" /></svg>Safe</span><span><svg class="ic"><use href="#i-users" /></svg>Trusted</span><span><svg class="ic"><use href="#i-leaf" /></svg>Sustainable</span><span><svg class="ic"><use href="#i-target" /></svg>Impactful</span></span>
+  </div>
+</section>
+
+<!-- 5 · Impact, benefits & future scope -->
+<section class="slide dense" data-scene="ambTop" style="justify-content: flex-end; padding-bottom: 9.5vh">
+  <div class="eyebrow">( 04 ) Impact, benefits &amp; future scope</div>
+  <h2>Earlier referrals, <em>clearer</em> answers</h2>
+  <div class="cols" style="grid-template-columns: 1fr 1.05fr 1fr; margin-top: 2vh">
+    <!-- impact -->
+    <div class="glass card sm">
+      <span class="lab blue"><svg class="ic"><use href="#i-users" /></svg>Impact on target audience</span>
+      <div class="aud">
+        <div class="a"><svg class="ic"><use href="#i-eye" /></svg><div class="t">Ophthalmologists</div><div class="d">Prioritise high-risk cases</div></div>
+        <span class="arrow">→</span>
+        <div class="a"><svg class="ic"><use href="#i-steth" /></svg><div class="t">Healthcare workers</div><div class="d">Guided screening</div></div>
+        <div class="a"><svg class="ic"><use href="#i-users" /></svg><div class="t">Rural patients</div><div class="d">Early access, report in their language</div></div>
+        <span class="arrow">→</span>
+        <div class="a"><svg class="ic"><use href="#i-pin" /></svg><div class="t">Remote health centres</div><div class="d">Local screening</div></div>
+      </div>
+    </div>
+    <!-- benefits -->
+    <div class="glass card sm">
+      <span class="lab green"><svg class="ic"><use href="#i-star" /></svg>Benefits</span>
+      <div class="ben">
+        <div class="it"><svg class="ic"><use href="#i-rupee" /></svg><div><div class="t">Affordable</div><div class="d">No GPU, open-source stack</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-phone" /></svg><div><div class="t">Portable</div><div class="d">Runs in a browser</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-hospital" /></svg><div><div class="t">Easy access</div><div class="d">Screening at the clinic</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-zap" /></svg><div><div class="t">Quick screening</div><div class="d"><span class="hl">≈ 5 s</span> per image</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-cpu" /></svg><div><div class="t">AI analysis</div><div class="d">4 trained models</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-search" /></svg><div><div class="t">Explainable AI</div><div class="d">Grad-CAM + lesion boxes</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-xcircle" /></svg><div><div class="t">Reduces human error</div><div class="d">Quality gate + second opinion</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-headset" /></svg><div><div class="t">Provides assistance</div><div class="d">Guided, step-by-step flow</div></div></div>
+      </div>
+    </div>
+    <!-- future scope -->
+    <div class="glass card sm">
+      <span class="lab blue"><svg class="ic"><use href="#i-target" /></svg>Future scope</span>
+      <div class="fut">
+        <div class="it"><svg class="ic"><use href="#i-lock" /></svg><div><div class="t">App security</div><div class="d">Auth, encrypted server storage</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-lang" /></svg><div><div class="t">Multilingual app</div><div class="d">Beyond EN · TE · HI</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-camera" /></svg><div><div class="t">Better hardware design</div><div class="d">Compact smartphone fundus kit</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-bars" /></svg><div><div class="t">DR severity detection</div><div class="d">Mild → Moderate → Severe → Proliferative</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-video" /></svg><div><div class="t">Telemedicine</div><div class="d">Remote specialist review</div></div></div>
+        <div class="it"><svg class="ic"><use href="#i-globe" /></svg><div><div class="t">Large-scale rural deployment</div><div class="d">After prospective field evaluation</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="shots" style="grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 1.6vh">
+    <figure class="slot wide"><img class="zoomable" src="assets/app_analyse.png" alt="Analysis screen" onerror="this.parentNode.classList.add('missing')" /><div class="ph">Add screenshot<br />assets/app_analyse.png</div><figcaption>Analysis · model verdict</figcaption></figure>
+    <figure class="slot wide"><img class="zoomable" src="assets/app_review.png" alt="Review with three evidence panels" onerror="this.parentNode.classList.add('missing')" /><div class="ph">Add screenshot<br />assets/app_review.png</div><figcaption>Review · Grad-CAM B4 · ViT · lesions</figcaption></figure>
+    <figure class="slot wide"><img class="zoomable" src="assets/app_report.png" alt="Report" onerror="this.parentNode.classList.add('missing')" /><div class="ph">Add screenshot<br />assets/app_report.png</div><figcaption>Signed report · verdict banner</figcaption></figure>
+    <figure class="slot wide"><img class="zoomable" src="assets/app_telugu.png" alt="Telugu report" onerror="this.parentNode.classList.add('missing')" /><div class="ph">Add screenshot<br />assets/app_telugu.png</div><figcaption>Report in తెలుగు / हिन्दी</figcaption></figure>
+  </div>
+</section>
+
+<!-- 6 · Research & references (eye) -->
+<section class="slide" data-scene="eye">
+  <div class="eyebrow">( 05 ) Research and references</div>
+  <h2>Built on <em>published</em> work</h2>
+  <ol class="refs">
+    <li>Rajalakshmi R. et al. (2015). Validation of smartphone-based retinal photography for DR screening. <i>PLoS ONE</i> 10(9).</li>
+    <li>Selvaraju R. R. et al. (2017). Grad-CAM: visual explanations from deep networks via gradient-based localization. <i>ICCV</i>.</li>
+    <li>Rajalakshmi R., Subashini R., Anjana R. M., Mohan V. (2018). Automated DR detection in smartphone-based fundus photography using AI. <i>Eye</i> 32, 1138–1144.</li>
+    <li>Jain A., Krishnan R., Rogye A., Natarajan S. (2021). Offline AI in a smartphone-based fundus camera for community DR screening. <i>Indian J Ophthalmol</i>.</li>
+    <li>Prayogo M. E. et al. (2023). Accuracy of low-cost smartphone retinal photography for DR screening: a systematic review. <i>JMIR</i>.</li>
+    <li>World Health Organization (2021). <i>Diabetic Retinopathy Screening: A Short Guide</i>.</li>
+    <li>Wroblewski J. J. et al. (2023). DR screening with smartphone fundus photography and deep-learning AI in the Yucatan Peninsula: a field study. <i>J Diabetes Sci Technol</i>.</li>
+  </ol>
+  <p class="note" style="font-size: clamp(11px, .9vw, 14px)">Datasets: APTOS 2019 Blindness Detection · IDRiD (grading + segmentation) · DRIVE. &nbsp; <span class="hl">Thank you</span> — GlucoIris · github.com/Siri120786/glucoiris</p>
+</section>
+
+<script>
+(() => {
+  // ---------------------------------------------------------------- utilities
+  let seed = 20261014;
+  const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const lerp3 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const clamp01 = (t) => Math.max(0, Math.min(1, t));
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const canvas = document.getElementById('stage');
+  const ctx = canvas.getContext('2d');
+  const bloom = document.createElement('canvas');
+  const bctx = bloom.getContext('2d');
+  let W = 0, H = 0, DPR = 1, A = 16 / 9; // world units: 1 = viewport height, x ∈ ±A/2
+
+  const glow = document.createElement('canvas');
+  glow.width = glow.height = 64;
+  { const g = glow.getContext('2d'); const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(245,248,255,1)'); gr.addColorStop(0.2, 'rgba(160,215,255,.85)'); gr.addColorStop(0.5, 'rgba(41,121,255,.25)'); gr.addColorStop(1, 'rgba(41,121,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64); }
+
+  // ---------------------------------------------------------------- fibres & scenes
+  const N = innerWidth < 800 ? 600 : 1150;
+  const fibres = [];
+  for (let i = 0; i < N; i++) {
+    const tone = Math.pow(rand(), 1.7), white = rand() < 0.05;
+    fibres.push({
+      color: white ? [225, 238, 255] : [Math.round(lerp(41, 125, tone)), Math.round(lerp(110, 222, tone)), 255],
+      delay: rand(), phase: rand() * Math.PI * 2, poses: {},
+    });
+  }
+
+  // Neurons: somata spread through a shallow 3D volume.
+  const SOMA = Array.from({ length: 16 }, (_, k) => {
+    const u = (k + 0.5) / 16;
+    return [(u - 0.5) * 1.55 + (rand() - 0.5) * 0.12, (rand() - 0.5) * 0.62, (rand() - 0.5) * 0.5];
+  });
+  const nearest = SOMA.map((s, i) => SOMA.map((t, j) => [j, Math.hypot(s[0] - t[0], s[1] - t[1], s[2] - t[2])]).filter(([j]) => j !== i).sort((a, b) => a[1] - b[1]).slice(0, 2).map(([j]) => j));
+
+  function poseStrands(i) {
+    const k = i % 72, u = k / 72, off = (rand() - 0.5) * 0.02;
+    const top = [0.05 + u * 0.9 - 0.3 + off, -0.75, (rand() - 0.5) * 0.3];
+    const tip = [-0.55 + u * 1.2 + off, 0.1 + rand() * 0.38, (rand() - 0.5) * 0.4];
+    return { p0: top, c: [lerp(top[0], tip[0], 0.5) + 0.25, lerp(top[1], tip[1], 0.45), tip[2]], p1: tip, w: 1.1, a: 0.07 + rand() * 0.05, tip: i < 72 ? 1 : 0 };
+  }
+  function poseEye(i) {
+    const th = (i / N) * Math.PI * 2 + (rand() - 0.5) * 0.05;
+    const rip = Math.sin(th * 7) * 0.012 + Math.sin(th * 13 + 1.3) * 0.008;
+    const r0 = 0.085 + rand() * 0.02, r1 = 0.2 + rip + rand() * 0.045, tw = (rand() - 0.5) * 0.12;
+    const z = (rand() - 0.5) * 0.03;
+    return {
+      p0: [Math.cos(th) * r0, Math.sin(th) * r0, z], c: [Math.cos(th + tw) * (r0 + r1) / 2, Math.sin(th + tw) * (r0 + r1) / 2, z - 0.02],
+      p1: [Math.cos(th + tw * 0.4) * r1, Math.sin(th + tw * 0.4) * r1, z - 0.04], w: 1 + rand() * 0.7, a: 0.4 + rand() * 0.32, tip: rand() < 0.07 ? 0.25 : 0, inner: 1,
+    };
+  }
+  function poseNeuron(i) {
+    const k = i % SOMA.length, s = SOMA[k];
+    if (rand() < 0.22) { // axon to a neighbour
+      const t = SOMA[nearest[k][Math.floor(rand() * 2)]], jit = () => (rand() - 0.5) * 0.02;
+      const mid = [(s[0] + t[0]) / 2 + (rand() - 0.5) * 0.18, (s[1] + t[1]) / 2 + (rand() - 0.5) * 0.18, (s[2] + t[2]) / 2];
+      return { p0: [s[0] + jit(), s[1] + jit(), s[2]], c: mid, p1: [t[0] + jit(), t[1] + jit(), t[2]], w: 0.8, a: 0.12 + rand() * 0.08, tip: 0 };
+    }
+    const az = rand() * Math.PI * 2, el = (rand() - 0.5) * 1.2, len = 0.05 + Math.pow(rand(), 1.6) * 0.16;
+    const dir = [Math.cos(az) * Math.cos(el), Math.sin(az) * Math.cos(el), Math.sin(el)];
+    const bend = (rand() - 0.5) * 0.5;
+    const p1 = [s[0] + dir[0] * len, s[1] + dir[1] * len, s[2] + dir[2] * len];
+    const c = [s[0] + dir[0] * len * 0.5 - dir[1] * len * bend, s[1] + dir[1] * len * 0.5 + dir[0] * len * bend, s[2] + dir[2] * len * 0.5];
+    return { p0: [s[0], s[1], s[2]], c, p1, w: 1 + rand() * 0.6, a: 0.3 + rand() * 0.3, tip: rand() < 0.18 ? 0.3 : 0 };
+  }
+  // Ambient ribbons: a flowing band of fibres placed away from the slide text.
+  function poseRibbon(i, path) {
+    const u = rand(), [x, y, tx, ty] = path(u), n = Math.hypot(tx, ty) || 1;
+    const nx = -ty / n, ny = tx / n, spread = (rand() - 0.5) * 0.22 * (0.4 + Math.sin(u * Math.PI));
+    const len = 0.04 + rand() * 0.08, z = (rand() - 0.5) * 0.6;
+    const p0 = [x + nx * spread, y + ny * spread, z];
+    const p1 = [p0[0] + (tx / n) * len, p0[1] + (ty / n) * len, z + (rand() - 0.5) * 0.04];
+    return { p0, c: lerp3(p0, p1, 0.5), p1, w: 0.9 + rand() * 0.6, a: 0.16 + rand() * 0.16, tip: rand() < 0.06 ? 0.25 : 0 };
+  }
+  const bez = (p0, p1, p2, p3) => (u) => {
+    const v = 1 - u;
+    const x = v*v*v*p0[0] + 3*v*v*u*p1[0] + 3*v*u*u*p2[0] + u*u*u*p3[0];
+    const y = v*v*v*p0[1] + 3*v*v*u*p1[1] + 3*v*u*u*p2[1] + u*u*u*p3[1];
+    const tx = 3*v*v*(p1[0]-p0[0]) + 6*v*u*(p2[0]-p1[0]) + 3*u*u*(p3[0]-p2[0]);
+    const ty = 3*v*v*(p1[1]-p0[1]) + 6*v*u*(p2[1]-p1[1]) + 3*u*u*(p3[1]-p2[1]);
+    return [x, y, tx, ty];
+  };
+  const PATHS = {
+    ambRight: bez([0.25, 0.55], [0.55, 0.1], [0.4, -0.3], [0.95, -0.55]),
+    ambLeft: bez([-0.95, 0.5], [-0.4, 0.2], [-0.75, -0.25], [-0.3, -0.6]),
+    ambBottom: bez([-0.95, 0.42], [-0.3, 0.05], [0.3, 0.55], [0.95, 0.2]),
+    ambTop: bez([-0.95, -0.42], [-0.3, -0.12], [0.3, -0.52], [0.95, -0.25]),
+  };
+  for (let i = 0; i < N; i++) {
+    const f = fibres[i];
+    f.poses.strands = poseStrands(i);
+    f.poses.eye = poseEye(i);
+    f.poses.neurons = poseNeuron(i);
+    for (const k in PATHS) f.poses[k] = poseRibbon(i, PATHS[k]);
+  }
+  const spokes = Array.from({ length: 32 }, (_, k) => ({ a: (k / 32) * Math.PI * 2, ph: rand() }));
+  const motes = Array.from({ length: 70 }, () => ({ x: rand() * 2 - 1, y: rand() * 2 - 1, r: 0.6 + rand() * 1.6, vx: (rand() - 0.5) * 0.004, vy: -0.002 - rand() * 0.005, ph: rand() * 6 }));
+
+  // ---------------------------------------------------------------- state
+  const state = { from: 'strands', to: 'eye', t: 0, dur: reduced ? 1 : 3200, start: performance.now(), via: false };
+  const ptr = { x: 0, y: 0, sx: 0, sy: 0 };
+  addEventListener('pointermove', (e) => { ptr.x = e.clientX / innerWidth - 0.5; ptr.y = e.clientY / innerHeight - 0.5; }, { passive: true });
+
+  function weights() {
+    const t = state.t;
+    if (!state.via) { const u = ease(t); return { [state.from]: 1 - u, [state.to]: (state.from === state.to ? 1 : u) }; }
+    if (t < 0.5) { const u = ease(t * 2); return { [state.from]: 1 - u, neurons: u }; }
+    const u = ease(t * 2 - 1); return { neurons: 1 - u, [state.to]: u };
+  }
+
+  function resize() {
+    DPR = Math.min(devicePixelRatio || 1, 1.75);
+    W = innerWidth; H = innerHeight; A = W / Math.max(1, H);
+    canvas.width = Math.max(1, Math.round(W * DPR)); canvas.height = Math.max(1, Math.round(H * DPR));
+    bloom.width = Math.max(1, Math.round(W / 4)); bloom.height = Math.max(1, Math.round(H / 4));
+  }
+  addEventListener('resize', resize); resize();
+
+  // 3D projection: yaw/pitch toward the cursor, perspective divide.
+  function projector(yaw, pitch) {
+    const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch), D = 2.4;
+    return (p) => {
+      let x = p[0] * cy + p[2] * sy, z = -p[0] * sy + p[2] * cy;
+      let y = p[1] * cp - z * sp; z = p[1] * sp + z * cp;
+      const f = D / (D + z);
+      return [W / 2 + x * f * H, H / 2 + y * f * H, f];
+    };
+  }
+
+  // Keep the loop alive no matter what one frame does (hidden tabs, zero-size windows).
+  function frame(now) {
+    requestAnimationFrame(frame);
+    if (canvas.width !== Math.round(innerWidth * Math.min(devicePixelRatio || 1, 1.75)) || !W || !H) resize();
+    if (!W || !H) return;
+    try { draw(now); } catch (e) { console.error(e); }
+  }
+
+  function draw(now) {
+    const time = reduced ? 0 : now / 1000;
+    state.t = clamp01((now - state.start) / state.dur);
+    ptr.sx += (ptr.x - ptr.sx) * 0.06; ptr.sy += (ptr.y - ptr.sy) * 0.06;
+    const w = weights();
+    const wEye = w.eye || 0, wNeu = w.neurons || 0;
+
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#03050a'; ctx.fillRect(0, 0, W, H);
+    const atm = (w.strands || 0) * 0.9 + 0.18;
+    const g = ctx.createRadialGradient(W * 0.6, H * 0.35, 0, W * 0.6, H * 0.35, Math.max(W, H) * 0.85);
+    g.addColorStop(0, `rgba(22,44,110,${0.7 * atm})`); g.addColorStop(0.55, `rgba(10,22,60,${0.4 * atm})`); g.addColorStop(1, 'rgba(3,5,10,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    const yaw = ptr.sx * (0.45 * wEye + 0.25 * (1 - wEye)), pitch = -ptr.sy * (0.35 * wEye + 0.18 * (1 - wEye));
+    const P = projector(yaw, pitch);
+    // The eye looks at the cursor: inner fibres shift more than outer ones.
+    const look = [ptr.sx * 0.09, ptr.sy * 0.09];
+    const EX = (A > 1.3 ? 0.42 : 0) * wEye; // eye sits right of the title on wide screens
+    const spin = time * 0.03;
+
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.lineCap = 'round';
+    const tips = [];
+    const keys = Object.keys(w);
+    for (const f of fibres) {
+      // per-fibre stagger inside the transition
+      let p0 = [0, 0, 0], c = [0, 0, 0], p1 = [0, 0, 0], wid = 0, al = 0, tip = 0, tot = 0;
+      for (const k of keys) {
+        let wk = w[k]; if (wk <= 0) continue;
+        const pz = f.poses[k];
+        tot += wk;
+        p0 = [p0[0] + pz.p0[0] * wk, p0[1] + pz.p0[1] * wk, p0[2] + pz.p0[2] * wk];
+        c = [c[0] + pz.c[0] * wk, c[1] + pz.c[1] * wk, c[2] + pz.c[2] * wk];
+        p1 = [p1[0] + pz.p1[0] * wk, p1[1] + pz.p1[1] * wk, p1[2] + pz.p1[2] * wk];
+        wid += pz.w * wk; al += pz.a * wk; tip += pz.tip * wk;
+      }
+      if (tot <= 0) continue;
+      // eye: rotate iris slowly and steer toward cursor
+      if (wEye > 0.01) {
+        const cs = Math.cos(spin * wEye), sn = Math.sin(spin * wEye);
+        const R = (p) => [p[0] * cs - p[1] * sn, p[0] * sn + p[1] * cs, p[2]];
+        p0 = R(p0); c = R(c); p1 = R(p1);
+        p0 = [p0[0] + look[0] * wEye + EX, p0[1] + look[1] * wEye, p0[2]];
+        c = [c[0] + look[0] * 0.7 * wEye + EX, c[1] + look[1] * 0.7 * wEye, c[2]];
+        p1 = [p1[0] + look[0] * 0.35 * wEye + EX, p1[1] + look[1] * 0.35 * wEye, p1[2]];
+      }
+      if (time) {
+        const sw = Math.sin(time * 0.6 + f.phase) * 0.008;
+        c = [c[0] + sw, c[1] + sw * 0.5, c[2]];
+        al *= 0.85 + Math.sin(time * 1.3 + f.phase * 3) * 0.15;
+      }
+      // during the neuron phase, fibres pulse like firing dendrites
+      if (wNeu > 0.01 && time) al *= 1 + wNeu * 0.6 * Math.max(0, Math.sin(time * 3 + f.phase * 2));
+      const A0 = P(p0), C = P(c), B = P(p1);
+      const depth = (A0[2] + B[2]) / 2;
+      ctx.strokeStyle = `rgba(${f.color[0]},${f.color[1]},${f.color[2]},${Math.min(1, al * depth * depth).toFixed(3)})`;
+      ctx.lineWidth = wid * depth;
+      ctx.beginPath(); ctx.moveTo(A0[0], A0[1]); ctx.quadraticCurveTo(C[0], C[1], B[0], B[1]); ctx.stroke();
+      if (tip > 0.02) tips.push([B[0], B[1], tip * depth, Math.min(1, al * 4)]);
+    }
+    for (const [x, y, r, a] of tips) { const s = H * 0.05 * r; ctx.globalAlpha = a; ctx.drawImage(glow, x - s / 2, y - s / 2, s, s); }
+    ctx.globalAlpha = 1;
+
+    // neuron somata
+    if (wNeu > 0.01) {
+      SOMA.forEach((s, k) => {
+        const [x, y, f] = P(s);
+        const pulse = 0.65 + 0.35 * Math.sin(time * 2.4 + k);
+        const sz = H * 0.07 * f * (0.8 + pulse * 0.4);
+        ctx.globalAlpha = wNeu * 0.9 * pulse;
+        ctx.drawImage(glow, x - sz / 2, y - sz / 2, sz, sz);
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    // eye: spoked white ring + pupil rim, tilted with the eye
+    if (wEye > 0.01) {
+      const R = 0.265, ctr = [look[0] * 0.25 + EX, look[1] * 0.25, 0];
+      ctx.strokeStyle = `rgba(235,244,255,${0.85 * wEye})`; ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let k = 0; k <= 96; k++) { const a = (k / 96) * Math.PI * 2; const [x, y] = P([ctr[0] + Math.cos(a) * R, ctr[1] + Math.sin(a) * R, 0]); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.stroke(); ctx.strokeStyle = `rgba(120,190,255,${0.22 * wEye})`; ctx.lineWidth = 9; ctx.stroke();
+      for (const sp of spokes) {
+        const a = sp.a + spin * 0.6;
+        const O = P([ctr[0] + Math.cos(a) * R, ctr[1] + Math.sin(a) * R, 0]);
+        const I = P([ctr[0] + Math.cos(a) * (R - 0.065), ctr[1] + Math.sin(a) * (R - 0.065), 0]);
+        const half = H * 0.0065, px = -Math.sin(a), py = Math.cos(a);
+        const gr = ctx.createLinearGradient(O[0], O[1], I[0], I[1]);
+        gr.addColorStop(0, `rgba(245,248,255,${0.9 * wEye})`); gr.addColorStop(1, 'rgba(120,190,255,0)');
+        ctx.fillStyle = gr; ctx.beginPath();
+        ctx.moveTo(O[0] + px * half, O[1] + py * half); ctx.lineTo(O[0] - px * half, O[1] - py * half); ctx.lineTo(I[0], I[1]); ctx.closePath(); ctx.fill();
+      }
+      const [px, py, pf] = P([look[0] + EX, look[1], 0]);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = `rgba(3,8,24,${0.9 * wEye})`;
+      ctx.beginPath(); ctx.arc(px, py, H * 0.078 * pf, 0, Math.PI * 2); ctx.fill();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.strokeStyle = `rgba(41,121,255,${0.7 * wEye})`; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(px, py, H * 0.08 * pf, 0, Math.PI * 2); ctx.stroke();
+      const hs = H * 0.03; ctx.globalAlpha = 0.5 * wEye; ctx.drawImage(glow, px - H * 0.03 - hs / 2, py - H * 0.03 - hs / 2, hs, hs); ctx.globalAlpha = 1;
+    }
+
+    // floating light motes
+    for (const m of motes) {
+      let x = ((((m.x + m.vx * time + 1) % 2) + 2) % 2) - 1, y = ((((m.y + m.vy * time + 1) % 2) + 2) % 2) - 1;
+      const tw = 0.35 + 0.65 * Math.abs(Math.sin(time * 0.8 + m.ph)), s = m.r * 7;
+      ctx.globalAlpha = 0.45 * tw; ctx.drawImage(glow, (x * 0.5 + 0.5) * W - s / 2, (y * 0.5 + 0.5) * H - s / 2, s, s);
+    }
+    ctx.globalAlpha = 1;
+
+    // bloom
+    bctx.globalCompositeOperation = 'copy'; bctx.drawImage(canvas, 0, 0, bloom.width, bloom.height);
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.55;
+    ctx.drawImage(bloom, 0, 0, canvas.width, canvas.height); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+    // vignette keeps text readable
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    const v = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);
+    v.addColorStop(0, 'rgba(3,5,10,0)'); v.addColorStop(1, 'rgba(3,5,10,.7)'); ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+  }
+  requestAnimationFrame(frame);
+
+  // ---------------------------------------------------------------- slides
+  const slides = [...document.querySelectorAll('.slide')];
+  const counter = document.getElementById('counter'), progress = document.getElementById('progress');
+  let idx = 0, busy = false;
+  const fmt = (n) => String(n).padStart(2, '0');
+  function show(i) {
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    counter.textContent = `[ ${fmt(i + 1)} / ${fmt(slides.length)} ]`;
+    progress.style.width = `${((i + 1) / slides.length) * 100}%`;
+    history.replaceState(null, '', `#${i + 1}`);
+  }
+  function go(n) {
+    if (busy || n < 0 || n >= slides.length || n === idx) return;
+    busy = true;
+    const out = slides[idx];
+    out.classList.add('leaving'); out.classList.remove('active');
+    // fibres → neurons → next scene
+    Object.assign(state, { from: currentScene(), to: slides[n].dataset.scene, t: 0, dur: reduced ? 1 : 1900, start: performance.now(), via: true });
+    const prev = idx; idx = n;
+    setTimeout(() => { slides[prev].classList.remove('leaving'); show(n); }, reduced ? 0 : 1150);
+    setTimeout(() => { busy = false; }, reduced ? 50 : 1900);
+  }
+  function currentScene() {
+    // the scene we are morphing FROM is whichever dominates right now
+    const w = weights(); return Object.entries(w).sort((a, b) => b[1] - a[1])[0][0];
+  }
+  addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); go(idx + 1); }
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); go(idx - 1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(slides.length - 1);
+    else if (e.key.toLowerCase() === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+  });
+  document.getElementById('navNext').addEventListener('click', () => go(idx + 1));
+  document.getElementById('navPrev').addEventListener('click', () => go(idx - 1));
+  const start = Math.min(slides.length - 1, Math.max(0, (parseInt(location.hash.slice(1), 10) || 1) - 1));
+  idx = start; show(start);
+  if (start !== 0) Object.assign(state, { from: slides[start].dataset.scene, to: slides[start].dataset.scene, t: 1, dur: 1, via: false });
+  // title text appears once the eye has mostly formed
+  if (start === 0 && !reduced) { slides[0].classList.remove('active'); setTimeout(() => slides[0].classList.add('active'), 1800); }
+})();
+</script>
+<script>
+// Slide content auto-fit (scales text and cards to fill the screen) + hover-to-enlarge images.
+(() => {
+  const slides = [...document.querySelectorAll('.slide')];
+  const wraps = slides.map((s) => { const w = document.createElement('div'); w.className = 'fit'; while (s.firstChild) w.appendChild(s.firstChild); s.appendChild(w); return w; });
+  function fit() {
+    slides.forEach((s, i) => {
+      const w = wraps[i], cs = getComputedStyle(s);
+      const availH = s.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      const ok = (z) => { w.style.zoom = z; return w.getBoundingClientRect().height <= availH + 1 && w.scrollWidth <= w.clientWidth + 1; };
+      let lo = 1, hi = s.classList.contains('dense') ? 1.6 : 1.25;
+      if (!ok(lo)) { hi = 1; lo = 0.6; }
+      for (let k = 0; k < 9; k++) { const m = (lo + hi) / 2; if (ok(m)) lo = m; else hi = m; }
+      w.style.zoom = lo;
+    });
+  }
+  let rt = 0;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(fit, 120); });
+  addEventListener('load', fit);
+  document.fonts?.ready.then(fit);
+  fit();
+
+  const lb = document.createElement('div'); lb.className = 'lightbox'; lb.innerHTML = '<img alt="" /><div class="cap"></div>';
+  document.body.appendChild(lb);
+  const big = lb.querySelector('img'), cap = lb.querySelector('.cap');
+  let timer = 0, openFor = null, entered = false, blocked = null;
+  const inRect = (r, e) => e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+  function open(img) {
+    big.src = img.currentSrc || img.src; big.alt = img.alt;
+    cap.textContent = img.closest('figure')?.querySelector('figcaption')?.textContent || '';
+    lb.classList.add('on'); openFor = img; entered = false;
+  }
+  function close() { if (!openFor) return; blocked = openFor; openFor = null; lb.classList.remove('on'); }
+  addEventListener('pointermove', (e) => {
+    if (openFor) {
+      if (inRect(big.getBoundingClientRect(), e)) entered = true;
+      else if (entered || !inRect(openFor.getBoundingClientRect(), e)) close();
+      return;
+    }
+    const act = document.querySelector('.slide.active');
+    const hit = act && [...act.querySelectorAll('img.zoomable')].find((im) => !im.closest('.missing') && inRect(im.getBoundingClientRect(), e));
+    if (hit !== blocked) blocked = null;
+    if (hit && hit !== blocked) { if (!timer) timer = setTimeout(() => { timer = 0; open(hit); }, 250); }
+    else { clearTimeout(timer); timer = 0; }
+  }, { passive: true });
+  lb.addEventListener('click', (e) => { e.stopPropagation(); close(); });
+  addEventListener('keydown', (e) => { if (openFor) { if (e.key === 'Escape') e.preventDefault(); close(); } }, true);
+})();
+</script>
+</body>
+</html>
