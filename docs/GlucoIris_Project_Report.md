@@ -116,6 +116,8 @@ Diabetic retinopathy (DR) is a leading cause of preventable blindness. Screening
 
 ## 4. System architecture
 
+Standalone diagram: [system-architecture.md](./system-architecture.md).
+
 ```mermaid
 flowchart LR
   subgraph Browser["Browser — React web app"]
@@ -160,6 +162,8 @@ flowchart LR
 ---
 
 ## 5. Clinical workflow
+
+Standalone diagram: [screening-workflow.md](./screening-workflow.md).
 
 ### 5.1 End-to-end flow (Mermaid)
 
@@ -326,6 +330,8 @@ The detail line lists B4 P(DR), the ViT grade, lesion counts per class, and **�
 ---
 
 ## 8. Results
+
+Standalone classifier metrics and confusion matrices: [model-performance-results.md](./model-performance-results.md).
 
 ### 8.1 Lesion segmentation — IDRiD test set (27 images, scored once)
 
